@@ -1,4 +1,4 @@
 {
-    "name":"TheBookReaders"
-    
+    "name":"TheBookReaders",
+    "mongodb":"mongodb://localhost/thebookkeepers"
 }

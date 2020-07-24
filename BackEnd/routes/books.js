@@ -1,20 +1,63 @@
-const express= require('express');
+const express = require('express');
+const mongoose = require('mongoose');
 const router = express.Router();
+const config = require('config');
+const Joi =require('joi');
 
-const books =[
-    {id:1, title:'The Great Gatsby', author:'DontKnow',},
-    {id:2, title:'Immortals of Meluha', author:'DontKnow',}
-]
+console.log(config.get('name'));
+mongoose.connect(config.get('mongodb'), {
+        useNewUrlParser: true,
+        useUnifiedTopology: true
+    })
+    .then(() => console.log("Connected to MongoDb"))
+    .catch(err => console.error("Error connecting to mongodb"));
+
+const userSchema = new mongoose.Schema({
+    name: String,
+    token: String,
+    booksToRead: [String],
+    booksRead: [{
+        bookId: String,
+        review: String,
+        rating: Number,
+        favouriteLines: [String],
+    }]
+});
+
+const bookSchema = new mongoose.Schema({
+    title: String,
+    author: String,
+    genre: String,
+    rating: Number,
+    totalRatings: Number,
+    reviews: [String]
+
+});
+
+const authorSchema = new mongoose.Schema({
+    name: String,
+    rating: Number
+});
+
+const genreSchema = new mongoose.Schema({
+    genre: String
+});
+
+const Book = mongoose.model('Books', bookSchema);
+const User = mongoose.model('Users', userSchema);
+const Author = mongoose.model('Authors', authorSchema);
+const Genre = mongoose.model('genres', genreSchema);
+
 
 //get all books
-router.get('/',(req,res)=>{
-    res.send(books);
+router.get('/', (req, res) => {
+
 });
 
 //get book with an id
-router.get('/:id',(req,res)=>{
-    const book = books.find(b => b.id == parseInt(req.params.id)); 
-    if(!book){
+router.get('/:id', (req, res) => {
+    const book = books.find(b => b.id == parseInt(req.params.id));
+    if (!book) {
         res.status(404).send(`The book with given id=${req.params.id} was not found!`);
         return;
     }
@@ -22,47 +65,55 @@ router.get('/:id',(req,res)=>{
 });
 
 //add a new book
-router.post('/',(req,res)=>{
-    const validationResult=Joi.validate(req.body, schema);
+router.post('/', async (req, res) => {
+    try {
+        const validationResult = validateBook(req.body);
 
-    if(validationResult.error){
-        // 400 bad request
-        res.status(400).send(validationResult.error.details[0].message);
-        return;
-    }
+        if (validationResult.error) {
+            // 400 bad request
+            res.status(400).send(validationResult.error.details[0].message);
+            return;
+        }
 
-    const book = {
-        id: books.length +1,
-        title: req.body.title,
-        author: req.body.author
+        const book = new Book({
+            title: req.body.title,
+            author: req.body.author,
+            genre: req.body.genre
+        });
+
+        const bookout = await book.save()
+        console.log("book added", bookout);
+        res.send(bookout);
     }
-    console.log(req.body);
-    books.push(book);
-    res.send(book);
+    catch(err){
+        console.error(err);
+        res.status(400).send(`Error processing request ${err.message}`);
+    }
 })
 
-router.put('/',(req,res)=>{
+router.put('/', (req, res) => {
     //look for the book
-    const book = books.find(b => b.id == parseInt(req.params.id)); 
-    if(!book){
+    const book = books.find(b => b.id == parseInt(req.params.id));
+    if (!book) {
         res.status(404).send(`The book with given id=${req.params.id} was not found!`);
         return;
     }
-    
-    const validationResult=validateBook(req.body);
-    if(validationResult.error){
+
+    const validationResult = validateBook(req.body);
+    if (validationResult.error) {
         // 400 bad request
         res.status(400).send(validationResult.error.details[0].message);
         return;
     }
 });
 
-function validateBook(book){
-    const schema={
-        name: Joi.string().min(1).required(),
-        author:Joi.string().min(1).required()
-    }
-    return validationResult=Joi.validate(book, schema);
+function validateBook(book) {
+    const schema = Joi.object({
+        title: Joi.string().min(1).required(),
+        author: Joi.string().min(1).required(),
+        genre: Joi.string().min(1).required(),
+    });
+    return validationResult = schema.validate(book);
 }
 
 module.exports = router;

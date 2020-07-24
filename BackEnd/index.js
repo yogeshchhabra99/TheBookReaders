@@ -9,11 +9,11 @@ const config = require('config');
 const booksRooter= require('./routes/books')
 var app=express();
 app.use(express.json());
-app.use(helmet);
+app.use(helmet());
 app.use('/api/books',booksRooter); // routes starting with '/api/books will be handled by this router'
 
-console.log(config.get('env'))
-if(config.get('env')=='development'){
+console.log(app.get('env'))
+if(app.get('env')=='development'){
     app.use(morgan('tiny'));
     startupDebugger('Morgan enabled...')
 }
