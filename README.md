@@ -7,5 +7,4 @@ This is a app where Readers can add the books the have read or want to read. Add
 The backend is built on Node.js. We use mongodb database. The reaspn for picking up a non relational database is that the objects have components that grow in size. Using relational database for this will have tables with a one one relations which is not efficient.
 
 ##FrontEnd 
-The frontend is built on React.js. Mainly as I wanted to learn React.
-
+The frontend is a progressive web app.

@@ -12,17 +12,7 @@ mongoose.connect(config.get('mongodb'), {
     .then(() => console.log("Connected to MongoDb"))
     .catch(err => console.error("Error connecting to mongodb"));
 
-const userSchema = new mongoose.Schema({
-    name: String,
-    token: String,
-    booksToRead: [String],
-    booksRead: [{
-        bookId: String,
-        review: String,
-        rating: Number,
-        favouriteLines: [String],
-    }]
-});
+
 
 const bookSchema = new mongoose.Schema({
     title: String,
@@ -34,18 +24,13 @@ const bookSchema = new mongoose.Schema({
 
 });
 
-const authorSchema = new mongoose.Schema({
-    name: String,
-    rating: Number
-});
+
 
 const genreSchema = new mongoose.Schema({
     genre: String
 });
 
 const Book = mongoose.model('Books', bookSchema);
-const User = mongoose.model('Users', userSchema);
-const Author = mongoose.model('Authors', authorSchema);
 const Genre = mongoose.model('genres', genreSchema);
 
 
