@@ -76,6 +76,7 @@ router.post('/', async (req, res) => {
     }
 })
 
+//update
 router.put('/', (req, res) => {
     //look for the book
     const book = books.find(b => b.id == parseInt(req.params.id));
@@ -91,6 +92,8 @@ router.put('/', (req, res) => {
         return;
     }
 });
+
+//Api to
 
 function validateBook(book) {
     const schema = Joi.object({
