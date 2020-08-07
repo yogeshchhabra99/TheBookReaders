@@ -24,6 +24,7 @@ Schema:
     ], 
 }
 
+APIS:
 1. Add a new Book
 Type: Post
 Route: /api/books/newBook
@@ -38,7 +39,11 @@ Body:{
     }
     genre: string
 }
-Note: When you add only these things, other fields will automatically be empty
+Return:{
+    success: bool,
+    error:string
+}
+Note: When you add only these things, other fields will automatically be empty. return success= true and error=String.empty if added successfully else set success=false amd add error message This is same for all POST APIS.
 
 2. Add a review to a book
 Type: Post
@@ -50,6 +55,10 @@ Body:{
     bookId:string, (mongo id_ of the book document where we want to add a review)
     review: string,
 }
+Return:{
+    success: bool,
+    error:string
+}
 Note: to get the id_ of the user who has added the review, use jsonwebtoken package as following:
 const jwt = require('jsonwebtoken');
 const token = req.header('x-auth-token');
@@ -58,7 +67,7 @@ const id_= jwt.verify(token,config.get("TokenPrivateKey"))._id
 just for info, this token will be sent to the user when he logs in by us using jwt.sign({_id:id},config.get("TokenPrivateKey"));
 
 3. Instert a new rating
-Type Post
+Type: Post
 Route:  /api/books/addRating
 Header:{
     'x-auth-token'
@@ -67,8 +76,92 @@ Body:{
     bookId:string, (mongo id_ of the book document where we want to add a review)
     rating: Number (1-10),
 }
+Return:{
+    success: bool,
+    error:string
+}
 Note: add ratings to book.totalRatings, dont forget to increase numRatings by 1. We dont need who added this rating here.
 
+4. Get all Books
+Type: Get
+Route: /api/books/:pageno
+Header:{
+    'x-auth-token': string
+}
+Return:{
+    success:bool,
+    books:[book objects],
+    error: string
+}
+Note: each page has 10 books, pageno==1 will give first 10 books, think of some way we can call which are first 10 i.e. some default sorting.
+
+later we'll add more apid, like gettiing books by genre or by author
+
+#### Users
+Schema:
+{
+    name: String,
+    userid: String, (provided by google login)
+    booksToRead: [{
+        id: string, (_id of the book ducument added by mongoose)
+        name: string, name of the book
+    }]
+    booksRead: [{
+        bookId: String, (_id of the book ducument added by mongoose)
+        Name: String,
+        review: String,
+        rating: Number,
+        favouriteLines: [String],
+    }]
+}
+
+1. User login or signup, and give token
+Route: /api/users/login
+Type: POST, wee need this post to pass userid in body
+body:{
+    userid: String (the userid given by google)
+}
+Return{
+    1. {
+        success: bool,
+        error: string
+    }
+    2. return 'x-auth-token' in author as following:
+    const token = jwt.sign({_id: user._id}, config.get('jwtPrivateKey'));
+    res.header('x-auth-token'token', token).send({success:bool, error: string}) 
+}
+Note: if user objects exists then get the _id or else create a new user object
+
+2. Add a new Book I read
+Route: /api/books/booksRead
+Header:{
+    'x-auth-token': string
+}
+Type: Post
+body: {
+    bookId: String, (_id of the book ducument added by mongoose)
+    Name: String,
+}
+Return:{
+    success: true
+    error:string
+    book: book object added
+}
+
+3. Add a review to a book
+Route: /api/books/addReview
+Type: Post
+Header:{
+    'x-auth-token': string
+}
+body:{
+    bookId: String, (_id of the book ducument added by mongoose)
+    review: String
+}
+Return:{
+    success: bool,
+    error: String
+}
 
 
 
