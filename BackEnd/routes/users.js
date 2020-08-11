@@ -47,7 +47,7 @@ router.post('/login',(req,res)=>{
     //check if user exists
     User.findOne({userId:req.body.userId}).then((user)=>{
         if(user){
-            //if user eexists
+            //if user exists
             const token= jwt.sign({id: user._id}, config.get("tokenKey"));
             res.header('x-auth-token',token).send({success:true})
         }

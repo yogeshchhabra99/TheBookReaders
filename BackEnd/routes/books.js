@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const router = express.Router();
 const config = require('config');
 const Joi =require('joi');
+const { ValidationError } = require('joi');
 
 console.log(config.get('name'));
 mongoose.connect(config.get('mongodb'), {
@@ -100,6 +101,7 @@ router.post('/newBook',(req,res)=>{
 /// <parameter>body of the request</parameter>
 /// <returns>JOI vvalidation result, result.error exists if validation fails</returns>
 function validationBook(book){
+    //input validation
     const schema=Joi.object({
         title: Joi.string().min(1).required(),
         author:{
@@ -109,7 +111,66 @@ function validationBook(book){
         genre: Joi.string().min(1).required()
     });
     return schema.validate(book);
-}
+};
 
+//Add a review to the book
+router.post('/addReview', (req, res) =>{
+    //input validation
+    validationResult = validationReview(req.body);
+    if(validationResult.error){
+        res.status(400).send({
+            success: false,
+            error: validationResult.error
+        });
+        return;
+    };
+    //update reviews[] if book exists
+    Book.updateOne(
+        {_id:req.body.bookId},
+        {
+            $push:{
+                reviews:{
+                    review: req.body.reviews.review,
+                    id: req.body.reviews.userId
+                }
+            }
+        }
+    )
+    .then((reviewAdded)=>{
+        if(reviewAdded.n){
+            console.log("Review Added: ",reviewAdded);
+                res.status(200).send({
+                    success:true,
+                    review:reviewAdded
+                });
+        }
+        else{
+            console.log(`No book with bookId : "${req.body.bookId}" is found.`);
+                res.status(404).send({
+                    success:false,
+                    review:reviewAdded
+                });
+        }
+    }).catch((e)=>{
+        console.log("Error Adding Review", e.message);
+        res.status(500).send({
+            success: false,
+            error: e.message
+        });
+    });  
+});
+/// <summary>validate if the review we got by Post request is valid</summary>
+/// <parameter>body of the request</parameter>
+/// <returns>JOI validation result, result.error exists if validation fails</returns>
+function validationReview(newReview){
+    const schema = Joi.object({
+        bookId : Joi.string().min(1).required(),
+        reviews:{
+            review : Joi.string().min(1).required(),
+            userId : Joi.string().min(1).required()
+        }
+    });
+    return schema.validate(newReview);
+};
 
 module.exports = router;
