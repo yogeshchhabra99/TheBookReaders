@@ -14,10 +14,11 @@ app.use(helmet());
 app.use('/api/books',booksRouter); // routes starting with '/api/books will be handled by this router'
 app.use('/api/users',usersRouter)
 console.log(app.get('env'))
-if(app.get('env')=='development'){
+if(config.get('env')=='development'){
     app.use(morgan('tiny'));
     startupDebugger('Morgan enabled...')
 }
+
 
 const PORT = config.get("port") || 7474;
 

@@ -16,10 +16,13 @@ mongoose.connect(config.get('mongodb'), {
 
 const bookSchema = new mongoose.Schema({
     title: String,
-    author: String,
+    author: {
+        name:String,
+        id:String,
+    },
     genre: String,
-    rating: Number,
-    totalRatings: Number,
+    totalRating: Number,
+    numRatings: Number,
     reviews: [{
         review: String,
         id: String
@@ -33,77 +36,79 @@ const genreSchema = new mongoose.Schema({
 });
 
 const Book = mongoose.model('Books', bookSchema);
-const Genre = mongoose.model('genres', genreSchema);
-
-
-//get all books
-router.get('/', (req, res) => {
-
-});
 
 //get book with an id
 router.get('/:id', (req, res) => {
-    const book = books.find(b => b.id == parseInt(req.params.id));
-    if (!book) {
-        res.status(404).send(`The book with given id=${req.params.id} was not found!`);
-        return;
-    }
-    res.send(book);
+    console.log("Find book with id:",req.params.id);
+    Book.findOne({_id:req.params.id})
+        .then((book_)=>{
+            res.status(200).send({
+                success:true,
+                book:book_
+            });
+        }).catch((e)=>{
+            console.log(`Error retrieving book with id:${req.params.id}`,e.message);
+            res.status(500).send({
+                success:false,
+                error:e.message,
+            });
+        });
+    
 });
 
-//add a new book
-router.post('/', async (req, res) => {
-    try {
-        const validationResult = validateBook(req.body);
 
-        if (validationResult.error) {
-            // 400 bad request
-            res.status(400).send(validationResult.error.details[0].message);
-            return;
-        }
 
-        const book = new Book({
-            title: req.body.title,
-            author: req.body.author,
-            genre: req.body.genre
+//Add a new book
+router.post('/newBook',(req,res)=>{
+    //input validation
+    validationResult=validationBook(req.body);
+    if(validationResult.error){
+        res.status(400).send(
+            {
+                success: false,
+                error: validationResult.error
+            });
+    }
+
+    const book = new Book({
+        title: req.body.title,
+        author:{
+            id: req.body.author.id,
+            name: req.body.author.name
+        },
+        genre:req.body.genre 
+    });
+
+    book.save()
+        .then((bookAdded)=>{
+            console.log("Book Added: ",bookAdded);
+            res.status(200).send({
+                success:true,
+                book:bookAdded
+            });
+        }).catch((e)=>{
+            console.log("Error Adding Book", e.message);
+            res.status(500).send({
+                success: false,
+                error: e.message
+            });
         });
-
-        const bookout = await book.save()
-        console.log("book added", bookout);
-        res.send(bookout);
-    }
-    catch(err){
-        console.error(err);
-        res.status(400).send(`Error processing request ${err.message}`);
-    }
 })
 
-//update
-router.put('/', (req, res) => {
-    //look for the book
-    const book = books.find(b => b.id == parseInt(req.params.id));
-    if (!book) {
-        res.status(404).send(`The book with given id=${req.params.id} was not found!`);
-        return;
-    }
-
-    const validationResult = validateBook(req.body);
-    if (validationResult.error) {
-        // 400 bad request
-        res.status(400).send(validationResult.error.details[0].message);
-        return;
-    }
-});
-
-//Api to
-
-function validateBook(book) {
-    const schema = Joi.object({
+/// <summary>validate if the book we got by Post request is valid</summary>
+/// <parameter>body of the request</parameter>
+/// <returns>returns true if book is valid else false</returns>
+function validationBook(book){
+    const schema=Joi.object({
         title: Joi.string().min(1).required(),
-        author: Joi.string().min(1).required(),
-        genre: Joi.string().min(1).required(),
+        author:{
+            id: Joi.string().min(1).required(),
+            name: Joi.string().min(1).required(),
+        },
+        genre: Joi.string().min(1).required()
     });
-    return validationResult = schema.validate(book);
+    return schema.validate(book);
 }
+
 
 module.exports = router;
