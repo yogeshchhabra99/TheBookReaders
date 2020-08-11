@@ -1,15 +1,21 @@
 const express = require('express');
-const mongoose = require('mongoose');
+const mongoose = require('mongoose');   // we do not need to connect in each file separately but need to import
 const router = express.Router();
 const config = require('config');
 const Joi =require('joi');
+const jwt=require('jsonwebtoken');
 
 const userSchema = new mongoose.Schema({
     name: String,
-    token: String,
-    booksToRead: [String], //array of bookids
+    userId: String, //provided by google
+    booksToRead: [{
+        id:String,
+        name: String
+    }],
+
     booksRead: [{
         bookId: String,
+        name:String,
         review: String,
         rating: Number,
         favouriteLines: [String],
@@ -18,35 +24,51 @@ const userSchema = new mongoose.Schema({
 
 const User = mongoose.model('Users', userSchema);
 
-function validateUser(user) {
-    const schema = Joi.object({
-        name: Joi.string().min(1).required(),
-        token: Joi.string().min(1).required(),
+function validateUser(user){
+    const schema=Joi.object({
+        userId: Joi.string().min(1).required(),
+        name: Joi.string().min(1).required()
     });
-    return validationResult = schema.validate(user);
+    return schema.validate(user);
 }
 
-router.post('/', async (req, res) => {
-    try {
-        const validationResult = validateUser(req.body);
-        if (validationResult.error) {
-            // 400 bad request
-            res.status(400).send(validationResult.error.details[0].message);
-            return;
-        }
-        const user= new User({
-            name:req.body.name,
-            token:req.body.token
-        });
+router.post('/login',(req,res)=>{
+    //input validation 
+    validationResult = validateUser(req.body)
+    if(validationResult.error){
+        res.status(400).send(
+            {
+                success: false,
+                error: validationResult.error
+            });
+        return ;
+    }
 
-        const userout = await user.save()
-        console.log("user added", userout);
-        res.send(userout);
-    }
-    catch(err){
-        console.error(err);
-        res.status(400).send(`Error processing request ${err.message}`);
-    }
+    //check if user exists
+    User.findOne({userId:req.body.userId}).then((user)=>{
+        if(user){
+            //if user eexists
+            const token= jwt.sign({id: user._id}, config.get("tokenKey"));
+            res.header('x-auth-token',token).send({success:true})
+        }
+        else{
+            user = new User({
+                userId:req.body.userId,
+                name:req.body.name,
+            });
+            user.save().then((user)=>{
+                const token= jwt.sign({id: user._id}, config.get("tokenKey"));
+                res.header('x-auth-token',token).send({success:true})
+            });
+        }
+    })
+    .catch((e)=>{
+        console.log("Error finding user",e.message);
+        res.status(500).send({
+            success:false,
+            error:e.message,
+        })
+    })
 })
 
 

@@ -68,6 +68,7 @@ router.post('/newBook',(req,res)=>{
                 success: false,
                 error: validationResult.error
             });
+        return;
     }
 
     const book = new Book({
@@ -97,7 +98,7 @@ router.post('/newBook',(req,res)=>{
 
 /// <summary>validate if the book we got by Post request is valid</summary>
 /// <parameter>body of the request</parameter>
-/// <returns>returns true if book is valid else false</returns>
+/// <returns>JOI vvalidation result, result.error exists if validation fails</returns>
 function validationBook(book){
     const schema=Joi.object({
         title: Joi.string().min(1).required(),
