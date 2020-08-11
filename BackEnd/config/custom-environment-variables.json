@@ -1,4 +1,5 @@
 {
     "port":"THEBOOKREADERS_PORT",
-    "env":"THEBOOKREADERS_ENV"
+    "env":"THEBOOKREADERS_ENV",
+    "tokenKey":"TOKENPRIVATEKEY"
 }

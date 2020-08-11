@@ -63,7 +63,7 @@ const jwt = require('jsonwebtoken');
 const token = req.header('x-auth-token');
 const id_= jwt.verify(token,config.get("TokenPrivateKey"))._id
 
-just for info, this token will be sent to the user when he logs in by us using jwt.sign({_id:id},config.get("TokenPrivateKey"));
+just for info, this token will be sent to the user when he logs in by us using jwt.sign({_id:id},config.get("TOKENPRIVATEKEY"));
 
 3. Instert a new rating
 Type: Post

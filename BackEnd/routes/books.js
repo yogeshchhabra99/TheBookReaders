@@ -20,8 +20,10 @@ const bookSchema = new mongoose.Schema({
     genre: String,
     rating: Number,
     totalRatings: Number,
-    reviews: [String]
-
+    reviews: [{
+        review: String,
+        id: String
+    }]
 });
 
 

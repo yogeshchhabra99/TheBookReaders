@@ -19,7 +19,7 @@ if(app.get('env')=='development'){
     startupDebugger('Morgan enabled...')
 }
 
-const PORT = config.get('port') || 7474;
+const PORT = config.get("port") || 7474;
 
 app.listen(PORT,()=>console.log(`Listening on Port ${PORT}`));
 
