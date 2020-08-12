@@ -5,7 +5,6 @@ const config = require('config');
 const Joi =require('joi');
 const { ValidationError } = require('joi');
 const jwt = require('jsonwebtoken');
-const token = req.header('x-auth-token');
 
 console.log(config.get('name'));
 mongoose.connect(config.get('mongodb'), {
@@ -127,13 +126,14 @@ router.post('/addReview', (req, res) =>{
         return;
     };
     //update reviews[] if book exists
+    const token = req.header('x-auth-token');
     Book.updateOne(
         {_id:req.body.bookId},
         {
             $push:{
                 reviews:{
                     review: req.body.review,
-                    id: jwt.verify(token,config.get("TokenPrivateKey"))._id
+                    id: jwt.verify(token,config.get("tokenKey"))._id
                 }
             }
         }
