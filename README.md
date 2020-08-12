@@ -44,7 +44,7 @@ Return:{
 }
 Note: When you add only these things, other fields will automatically be empty. return success= true and error=String.empty if added successfully else set success=false amd add error message This is same for all POST APIS.
 
-2. Add a review to a book
+2. Add a review to a book (Completed;(token == null check remaining))
 Type: Post
 Route: /api/books/addReview
 Header:{
@@ -61,9 +61,9 @@ Return:{
 Note: to get the id_ of the user who has added the review, use jsonwebtoken package as following:
 const jwt = require('jsonwebtoken');
 const token = req.header('x-auth-token');
-const id_= jwt.verify(token,config.get("TokenPrivateKey"))._id
+const id_= jwt.verify(token,config.get("tokenKey"))._id
 
-just for info, this token will be sent to the user when he logs in by us using jwt.sign({_id:id},config.get("TOKENPRIVATEKEY"));
+just for info, this token will be sent to the user when he logs in by us using jwt.sign({_id:id},config.get("tokenKey"));
 
 3. Instert a new rating
 Type: Post
