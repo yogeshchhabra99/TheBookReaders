@@ -52,10 +52,7 @@ Header:{
 }
 Body:{
     bookId:string, (mongo id_ of the book document where we want to add a review)
-    review: {
-        review: string,
-        id: userId
-    }
+    review: string,
 }
 Return:{
     success: bool,

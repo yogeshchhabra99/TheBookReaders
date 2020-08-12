@@ -4,6 +4,8 @@ const router = express.Router();
 const config = require('config');
 const Joi =require('joi');
 const { ValidationError } = require('joi');
+const jwt = require('jsonwebtoken');
+const token = req.header('x-auth-token');
 
 console.log(config.get('name'));
 mongoose.connect(config.get('mongodb'), {
@@ -130,8 +132,8 @@ router.post('/addReview', (req, res) =>{
         {
             $push:{
                 reviews:{
-                    review: req.body.reviews.review,
-                    id: req.body.reviews.userId
+                    review: req.body.review,
+                    id: jwt.verify(token,config.get("TokenPrivateKey"))._id
                 }
             }
         }
@@ -165,10 +167,7 @@ router.post('/addReview', (req, res) =>{
 function validationReview(newReview){
     const schema = Joi.object({
         bookId : Joi.string().min(1).required(),
-        reviews:{
-            review : Joi.string().min(1).required(),
-            userId : Joi.string().min(1).required()
-        }
+        review : Joi.string().min(1).required()
     });
     return schema.validate(newReview);
 };
