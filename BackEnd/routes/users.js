@@ -87,39 +87,57 @@ router.post('/booksRead', (req, res)=>{
     //retrieving user id from token key
     const token = req.header('x-auth-token');
     const id_= jwt.verify(token,config.get("tokenKey")).id;
-    //sending bookId to books.js to find whether the book exist in database or not
-    //retrieving a promise bookSearch
-    const bookSearch = books.findBook(req.body.bookId);
-    //Updating booksRead for the user
-    bookSearch.then((result)=>{
-            User.updateOne({_id:id_},{
-                $push:{
-                    booksRead:{
-                        bookId:result.id,
-                        name : result.name
+    User.findOne({_id:id_,booksRead:{$elemMatch:{bookId:req.body.bookId}}}).then((id)=>{
+        if(id){
+            console.log(`Book with id ${req.body.bookId} has been already added to booksRead`);
+            res.status(500).send({
+                success:false,
+                Error:`Book with id ${req.body.bookId} has been already added to booksRead`
+            });
+        }
+        else{
+            //sending bookId to books.js to find whether the book exist in database or not
+            //retrieving a promise bookSearch
+            const bookSearch = books.findBook(req.body.bookId);
+            //Updating booksRead for the user
+            bookSearch.then((result)=>{
+                User.updateOne({_id:id_},{
+                    $push:{
+                        booksRead:{
+                            bookId:result.id,
+                            name : result.name
+                        }
                     }
-                }
-            }).then((bookRead)=>{
-                console.log("Book is added to booksRead: ",result);
-                res.status(200).send({
-                    success:true,
-                    bookRead:bookRead,
-                    bookAdded:result
+                }).then((bookRead)=>{
+                    console.log("Book is added to booksRead: ",result);
+                    res.status(200).send({
+                        success:true,
+                        bookRead:bookRead,
+                        bookAdded:result
+                    });
+                }).catch((e)=>{
+                    console.log("Error : ",e.message);
+                    res.status(500).send({
+                        success:false,
+                        Error:e.message
+                    });
                 });
-            }).catch((e)=>{
-                console.log("Error : ",e.message);
-                res.status(500).send({
+            }).catch((result)=>{
+                console.log(`Book with id "${req.body.bookId}" is not found.`);
+                res.status(404).send({
                     success:false,
-                    Error:e.message
+                    bookRead:result
                 });
             });
-    }).catch((result)=>{
-        console.log(`Book with id "${req.body.bookId}" is not found.`);
-        res.status(404).send({
+        }
+    }).catch((e)=>{
+        console.log("Error : ",e.message);
+        res.status(500).send({
             success:false,
-            bookRead:result
+            Error:e.message
         });
     });
+    
 });
 
 function validateBookRead(bookRead){
