@@ -14,8 +14,6 @@ mongoose.connect(config.get('mongodb'), {
     .then(() => console.log("Connected to MongoDb"))
     .catch(err => console.error("Error connecting to mongodb"));
 
-
-
 const bookSchema = new mongoose.Schema({
     title: String,
     author: {
@@ -96,7 +94,7 @@ router.post('/newBook',(req,res)=>{
                 error: e.message
             });
         });
-})
+});
 
 /// <summary>validate if the book we got by Post request is valid</summary>
 /// <parameter>body of the request</parameter>
@@ -112,7 +110,7 @@ function validationBook(book){
         genre: Joi.string().min(1).required()
     });
     return schema.validate(book);
-};
+}
 
 //Add a review to the book
 router.post('/addReview', (req, res) =>{
@@ -124,7 +122,7 @@ router.post('/addReview', (req, res) =>{
             error: validationResult.error
         });
         return;
-    };
+    }
     //update reviews[] if book exists
     const token = req.header('x-auth-token');
     Book.updateOne(
@@ -141,10 +139,10 @@ router.post('/addReview', (req, res) =>{
     .then((reviewAdded)=>{
         if(reviewAdded.n){
             console.log("Review Added: ",reviewAdded);
-                res.status(200).send({
-                    success:true,
-                    review:reviewAdded
-                });
+            res.status(200).send({
+                success:true,
+                review:reviewAdded
+            });
         }
         else{
             console.log(`No book with bookId : "${req.body.bookId}" is found.`);
@@ -170,6 +168,30 @@ function validationReview(newReview){
         review : Joi.string().min(1).required()
     });
     return schema.validate(newReview);
-};
+}
 
+//api to addRating
+
+function findBook(bookToFind){
+    return new Promise((resolve, reject)=>{
+        Book.findOne({_id:bookToFind}).then((book)=>{
+            if(book){
+                resolve( obj ={
+                    name : book.title,
+                    id : book._id
+                });
+            }
+            else{
+                reject( 'Error 404. Book not found.');
+            }
+        }).catch((e)=>{
+            console.log("Error : ",e.message);
+            res.status(500).send({
+                success:false,
+                error:e.message,
+            });
+        });
+    });
+}
 module.exports = router;
+module.exports.findBook = findBook;

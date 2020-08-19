@@ -61,7 +61,7 @@ Return:{
 Note: to get the id_ of the user who has added the review, use jsonwebtoken package as following:
 const jwt = require('jsonwebtoken');
 const token = req.header('x-auth-token');
-const id_= jwt.verify(token,config.get("tokenKey"))._id
+const id_= jwt.verify(token,config.get("tokenKey")).id
 
 just for info, this token will be sent to the user when he logs in by us using jwt.sign({_id:id},config.get("tokenKey"));
 
@@ -107,7 +107,7 @@ Schema:
     }]
     booksRead: [{
         bookId: String, (_id of the book ducument added by mongoose)
-        Name: String,
+        name: String,
         review: String,
         rating: Number,
         favouriteLines: [String],
@@ -132,14 +132,13 @@ Return{
 Note: if user objects exists then get the _id or else create a new user object
 
 2. Add a new Book I read
-Route: /api/books/booksRead
+Route: /api/users/booksRead
 Header:{
     'x-auth-token': string
 }
 Type: Post
 body: {
     bookId: String, (_id of the book ducument added by mongoose)
-    Name: String,
 }
 Return:{
     success: true
@@ -148,7 +147,7 @@ Return:{
 }
 
 3. Add a review to a book
-Route: /api/books/addReview
+Route: /api/users/addReview
 Type: Post
 Header:{
     'x-auth-token': string
