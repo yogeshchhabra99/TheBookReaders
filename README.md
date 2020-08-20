@@ -13,7 +13,7 @@ Schema:
     title: String, (title of the book)
     author:{
         id: string, (id_ of the author document in authors collection, node that thais id_ is created by mongoose itself)
-        name: string, (name of author, this creates redundency, but still do it for performance reasons)
+        name: string, (name of author, this creates redundancy, but still do it for performance reasons)
     }
     genre: String, (genre in string, not any id)
     totalRating: Number,(sum of ratings added by all persons)
@@ -46,7 +46,7 @@ Return:{
 Status: Completed
 Note: When you add only these things, other fields will automatically be empty. return success= true and error=String.empty if added successfully else set success=false amd add error message This is same for all POST APIS.
 
-2. Add a review to a book
+2. Add a review to a book (Completed;(token == null check remaining))
 Type: Post
 Route: /api/books/addReview
 Header:{
@@ -63,9 +63,9 @@ Return:{
 Note: to get the id_ of the user who has added the review, use jsonwebtoken package as following:
 const jwt = require('jsonwebtoken');
 const token = req.header('x-auth-token');
-const id_= jwt.verify(token,config.get("TokenPrivateKey")).id
+const id_= jwt.verify(token,config.get("tokenKey")).id
 
-just for info, this token will be sent to the user when he logs in by us using jwt.sign({_id:id},config.get("TOKENPRIVATEKEY"));
+just for info, this token will be sent to the user when he logs in by us using jwt.sign({_id:id},config.get("tokenKey"));
 
 3. Instert a new rating
 Type: Post
@@ -135,14 +135,13 @@ Return{
 Note: if user objects exists then get the _id or else create a new user object
 
 2. Add a new Book I read
-Route: /api/books/booksRead
+Route: /api/users/booksRead
 Header:{
     'x-auth-token': string
 }
 Type: Post
 body: {
     bookId: String, (_id of the book ducument added by mongoose)
-    Name: String,
 }
 Return:{
     success: true
@@ -151,7 +150,7 @@ Return:{
 }
 
 3. Add a review to a book
-Route: /api/books/addReview
+Route: /api/users/addReview
 Type: Post
 Header:{
     'x-auth-token': string
