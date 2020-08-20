@@ -6,8 +6,8 @@ const express = require('express');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const config = require('config');
-const booksRouter= require('./routes/books')
-const usersRouter= require('./routes/users')
+const booksRouter= require('./routes/books').router;
+const usersRouter= require('./routes/users').router;
 var app=express();
 app.use(express.json());
 app.use(helmet());

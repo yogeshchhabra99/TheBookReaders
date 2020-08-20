@@ -40,8 +40,10 @@ Body:{
 }
 Return:{
     success: bool,
-    error:string
+    error:string(if success==false)
+    book: JSON object of book added (if success==true)
 }
+Status: Completed
 Note: When you add only these things, other fields will automatically be empty. return success= true and error=String.empty if added successfully else set success=false amd add error message This is same for all POST APIS.
 
 2. Add a review to a book
@@ -61,7 +63,7 @@ Return:{
 Note: to get the id_ of the user who has added the review, use jsonwebtoken package as following:
 const jwt = require('jsonwebtoken');
 const token = req.header('x-auth-token');
-const id_= jwt.verify(token,config.get("TokenPrivateKey"))._id
+const id_= jwt.verify(token,config.get("TokenPrivateKey")).id
 
 just for info, this token will be sent to the user when he logs in by us using jwt.sign({_id:id},config.get("TOKENPRIVATEKEY"));
 
@@ -100,14 +102,14 @@ later we'll add more apid, like gettiing books by genre or by author
 Schema:
 {
     name: String,
-    userid: String, (provided by google login)
+    userId: String, (provided by google login)
     booksToRead: [{
         id: string, (_id of the book ducument added by mongoose)
         name: string, name of the book
     }]
     booksRead: [{
         bookId: String, (_id of the book ducument added by mongoose)
-        Name: String,
+        name: String,
         review: String,
         rating: Number,
         favouriteLines: [String],
@@ -118,7 +120,8 @@ Schema:
 Route: /api/users/login
 Type: POST, wee need this post to pass userid in body
 body:{
-    userid: String (the userid given by google)
+    userId: String (the userid given by google),
+    name: String
 }
 Return{
     1. {
@@ -127,7 +130,7 @@ Return{
     }
     2. return 'x-auth-token' in author as following:
     const token = jwt.sign({_id: user._id}, config.get('jwtPrivateKey'));
-    res.header('x-auth-token'token', token).send({success:bool, error: string}) 
+    res.header('x-auth-token', token).send({success:bool, error: string}) 
 }
 Note: if user objects exists then get the _id or else create a new user object
 
