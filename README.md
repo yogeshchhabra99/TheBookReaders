@@ -164,7 +164,43 @@ Return:{
     error: String
 }
 
+4. Add a favourite Line to a book
+Route: /api/users/favouriteLine
+Type: Post
+Header:{
+    'x-auth-token': string
+}
+body:{
+    bookId: String, (_id of the book ducument added by mongoose)
+    favouriteLine: String
+}
+Return:{
+    success: bool,
+    error: String
+}
 
+
+5. Add a bookToRead
+    same as 2.
+
+6. Get all books a user has read:
+Type:Get
+
+7. Get all books he wants to read
+Type:Get
+
+####Author
+Schema:{
+    name:String
+    books[string] (ids of all the books he has written)
+}
+
+API:
+1. Create a new Author using name
+Type:POST
+
+2. Get All books by a author
+Type:Get
 
 ##FrontEnd 
 The frontend is a progressive web app.
