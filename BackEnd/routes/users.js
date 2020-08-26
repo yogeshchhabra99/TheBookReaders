@@ -95,7 +95,7 @@ router.post('/booksRead', (req, res)=>{
                 throw({
                     status:400,
                     message:`Book with id ${req.body.bookId} has been already added to booksRead`
-                })
+                });
             }
             else{
             //sending bookId to books.js to find whether the book exist in database or not
@@ -113,7 +113,7 @@ router.post('/booksRead', (req, res)=>{
                         name: book.name
                     }
                 }
-            })
+            });
         })
         .then((bookRead)=>{
             console.log("Book is added to booksRead: ",bookRead);

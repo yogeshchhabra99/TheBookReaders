@@ -192,15 +192,21 @@ Type:Get
 ####Author
 Schema:{
     name:String
-    books[string] (ids of all the books he has written)
+    books:[string] (ids of all the books he has written)
 }
 
 API:
 1. Create a new Author using name
+Route: /api/authors/newAuthor
 Type:POST
 
-2. Get All books by a author
+2. Get All books by an author
+Route: /api/authors/:id/:pageno
 Type:Get
+
+3. Add book to an author.
+Route: /api/authors/addBook
+Type:POST
 
 ##FrontEnd 
 The frontend is a progressive web app.

@@ -5,6 +5,7 @@ const config = require('config');
 const Joi =require('joi');
 const { ValidationError } = require('joi');
 const jwt = require('jsonwebtoken');
+const authors = require('./authors.js');
 
 console.log(config.get('name'));
 mongoose.connect(config.get('mongodb'), {
@@ -105,7 +106,7 @@ function validationBook(book){
         title: Joi.string().min(1).required(),
         author:{
             id: Joi.string().min(1).required(),
-            name: Joi.string().min(1).required(),
+            name: Joi.string().min(1).required()
         },
         genre: Joi.string().min(1).required()
     });
@@ -192,7 +193,7 @@ function findBook(bookToFind){
             reject({
                 status:500,
                 message:"Error finding book"
-            })
+            });
         });
     });
 }
