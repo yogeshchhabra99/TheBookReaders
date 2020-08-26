@@ -96,7 +96,6 @@ router.post('/addBook', (req, res)=>{
         console.log(`${req.body.book} is added to author with id ${req.body.id}`);
         res.status(200).send({
             status:true,
-            book: book,
             message: `${req.body.book} is added to author with id ${req.body.id}`
         });
     }).catch((e)=>{

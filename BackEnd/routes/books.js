@@ -39,7 +39,7 @@ const genreSchema = new mongoose.Schema({
 const Book = mongoose.model('Books', bookSchema);
 
 //get book with an id
-router.get('/:id', (req, res) => {
+router.get('/bookId/:id', (req, res) => {
     console.log("Find book with id:",req.params.id);
     Book.findOne({_id:req.params.id})
         .then((book_)=>{
@@ -56,8 +56,6 @@ router.get('/:id', (req, res) => {
         });
     
 });
-
-
 
 //Add a new book
 router.post('/newBook',(req,res)=>{
@@ -172,6 +170,63 @@ function validationReview(newReview){
 }
 
 //api to addRating
+router.post('/addRating', (req,res)=>{
+    //input validation
+    validationResult = validationRating(req.body);
+    if(validationResult.error){
+        res.status(400).send({
+            success: false,
+            error: validationResult.error
+        });
+        return;
+    }
+    Book.updateOne({_id:req.body.bookId},{
+        totalRating:totalRating+req.body.rating,
+        numRatings:numRatings+1
+    }).then((rating)=>{
+        console.log(`Rating updated. New Rating is ${totalRating/numRatings}`);
+        res.status(200).send({
+            success:true,
+            message:`Rating updated. New Rating is ${totalRating/numRatings}`
+        });
+    }).catch((e)=>{
+        console.log(`Error in updating ratings : ${e.message}`);
+        res.status(200).send({
+            success:true,
+            error: e.message
+        });
+    });
+});
+
+function validationRating(newRating){
+    const schema = Joi.object({
+        bookId : Joi.string().min(1).required(),
+        rating : Joi.number().greater(0).less(11).required()
+    });
+    return schema.validate(newReview);
+}
+
+router.get('/:pageno', (req, res)=>{
+    Book.find({}).then((book)=>{
+    console.log(book);
+    if((req.params.pageno>book.length/10+1) || (req.params.pageno<1)){
+        console.log('Error 404. No such page exists.');
+        res.status(404).send({
+            success : false,
+            Error : `No page found.`
+        });
+        return;
+    }
+    else{
+        let page = book.slice((req.params.pageno-1)*10,req.params.pageno*10);
+        console.log(page);
+        res.status(200).send({
+            success : true,
+            books : page
+        });
+    }
+    });
+});
 
 function findBook(bookToFind){
     return new Promise((resolve, reject)=>{
