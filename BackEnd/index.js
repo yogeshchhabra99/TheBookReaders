@@ -9,6 +9,7 @@ const morgan = require('morgan');
 const config = require('config');
 const booksRouter= require('./routes/books');
 const usersRouter= require('./routes/users');
+const authorsRouter= require('./routes/authors');
 var app=express();
 
 const corsOptions = {
@@ -20,6 +21,7 @@ app.use(express.json());
 app.use(helmet());
 app.use('/api/books',booksRouter); // routes starting with '/api/books will be handled by this router'
 app.use('/api/users',usersRouter);
+app.use('/api/authors',authorsRouter);
 console.log(app.get('env'));
 if(config.get('env')=='development'){
     app.use(morgan('tiny'));

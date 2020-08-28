@@ -12,7 +12,7 @@ Schema:
 {
     title: String, (title of the book)
     author:{
-        id: string, (id_ of the author document in authors collection, node that thais id_ is created by mongoose itself)
+        id: string, (id_ of the author document in authors collection, note that this id_ is created by mongoose itself)
         name: string, (name of author, this creates redundancy, but still do it for performance reasons)
     }
     genre: String, (genre in string, not any id)
@@ -24,11 +24,24 @@ Schema:
     ], 
 }
 
-1. Add a new Book
+1. Get book with an id
+Type: Get
+Route: /api/books/bookId/:id
+Header:{
+    'x-auth-token':string, (auhentication token)
+}
+Return:{
+    success:bool,
+    books:book object,
+    error: string
+}
+Status: Completed
+
+2. Add a new Book
 Type: Post
 Route: /api/books/newBook
 Header:{
-    'x-auth-token':string, (auhentication token) // @gupta ignore this for now, I will add a middleware for this later
+    'x-auth-token':string, (auhentication token)
 }
 Body:{
     title:string,
@@ -46,7 +59,7 @@ Return:{
 Status: Completed
 Note: When you add only these things, other fields will automatically be empty. return success= true and error=String.empty if added successfully else set success=false amd add error message This is same for all POST APIS.
 
-2. Add a review to a book (Completed;(token == null check remaining))
+3. Add a review to a book (Completed;(token == null check remaining))
 Type: Post
 Route: /api/books/addReview
 Header:{
@@ -60,6 +73,7 @@ Return:{
     success: bool,
     error:string
 }
+Status: Completed
 Note: to get the id_ of the user who has added the review, use jsonwebtoken package as following:
 const jwt = require('jsonwebtoken');
 const token = req.header('x-auth-token');
@@ -67,7 +81,7 @@ const id_= jwt.verify(token,config.get("tokenKey")).id
 
 just for info, this token will be sent to the user when he logs in by us using jwt.sign({_id:id},config.get("tokenKey"));
 
-3. Instert a new rating
+4. Instert a new rating
 Type: Post
 Route:  /api/books/addRating
 Header:{
@@ -79,11 +93,13 @@ Body:{
 }
 Return:{
     success: bool,
-    error:string
+    message: string,
+    error: string
 }
+Status: Completed
 Note: add ratings to book.totalRatings, dont forget to increase numRatings by 1. We dont need who added this rating here.
 
-4. Get all Books
+5. Get all Books
 Type: Get
 Route: /api/books/:pageno
 Header:{
@@ -94,9 +110,10 @@ Return:{
     books:[book objects],
     error: string
 }
+Status: Completed
 Note: each page has 10 books, pageno==1 will give first 10 books, think of some way we can call which are first 10 i.e. some default sorting.
 
-later we'll add more apid, like gettiing books by genre or by author
+later we'll add more apis, like gettiing books by genre or by author
 
 #### Users
 Schema:
@@ -192,15 +209,57 @@ Type:Get
 ####Author
 Schema:{
     name:String
-    books[string] (ids of all the books he has written)
+    books:[string] (ids of all the books he has written)
 }
 
 API:
 1. Create a new Author using name
+Route: /api/authors/newAuthor
 Type:POST
+Header:{
+    'x-auth-token': string
+}
+body:{
+    name : String
+}
+Return:{
+    success: bool,
+    author: authorAdded object,
+    error: String
+}
+Status: Completed
 
-2. Get All books by a author
+2. Get All books by an author
+Route: /api/authors/:id/:pageno
+(pageno : indexed from 1)
+//10 books per page
 Type:Get
+Header:{
+    'x-auth-token': string
+}
+Return:{
+    success:bool,
+    books:[book objects],
+    error: string
+}
+Status: Completed
+
+3. Add book to an author.
+Route: /api/authors/addBook
+Type:POST
+Header:{
+    'x-auth-token': string
+}
+body:{
+    id : String
+    book : String //bookId
+}
+Return:{
+    success: bool,
+    message: String,
+    error: String
+}
+Status: Completed
 
 ##FrontEnd 
 The frontend is a progressive web app.
