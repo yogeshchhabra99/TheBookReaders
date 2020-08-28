@@ -1,0 +1,9 @@
+#home{
+    display: grid;
+    grid-template-columns: 20% 80%;
+}
+
+#mainHome{
+    padding:1%;
+    height:100vh;
+}

@@ -1,0 +1,36 @@
+/* layout styles */
+  nav{
+    background: var(--primary);
+    border-bottom: 15px solid var(--secondary);
+  }
+  nav a{
+    text-transform: uppercase;
+    color: var(--title);
+    font-size: 45px;
+
+  }
+  nav a span{
+    font-weight: bold;
+  }
+  nav .sidenav-trigger{
+    margin: 0;
+  }
+
+  .topNav{
+    height:150px;
+  }
+
+  #topBar{
+    display: grid;
+    grid-template-columns: 20% 80%;
+  }
+  #topBar >img{
+    margin:auto
+  }
+  #topTitle{
+    margin-top: 40px;
+    margin-left: 40px;
+  }
+
+  
+  

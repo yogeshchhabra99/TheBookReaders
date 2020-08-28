@@ -27,6 +27,7 @@ const User = mongoose.model('Users', userSchema);
 
 router.post('/login',(req,res)=>{
     //input validation 
+    console.log("Login Request", req.body);
     validationResult = validateUser(req.body);
     if(validationResult.error){
         res.status(400).send(

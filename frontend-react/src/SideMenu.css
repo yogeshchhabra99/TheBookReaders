@@ -1,0 +1,20 @@
+#sideMenu{
+    background: var(--primary);
+    height: 100vh;
+    padding-top: 1vh;
+}
+
+#sideMenuItem{
+    height: 5vh;
+    padding-left: 2vw;
+    font-size: large;
+    
+}
+
+#sideMenuItem:hover{
+    background:var(--secondary);
+}
+
+#sideMenuItem:active{
+    background:var(--title);
+}
