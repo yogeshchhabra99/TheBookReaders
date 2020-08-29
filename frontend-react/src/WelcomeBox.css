@@ -1,0 +1,50 @@
+.welcomeBoxWrapper{
+    position: absolute;
+    display:grid ;
+    grid-template-columns: 65% 35%;
+    width:50%;   
+    left: 20%;
+    top: 20%; 
+    height: 50%;
+}
+p{
+    font-family: Open Sans;
+}
+#infoBox{
+    background: var(--primary);
+    display: grid;
+    grid-template-rows: auto auto;
+}
+
+#infoBox >img{
+    padding:2%;
+    margin:auto;
+    max-width: 100%;
+    max-height: 100%;
+}
+#infoBox >p{
+    padding:4%;
+    margin:auto;
+    font-family:Open Sans;
+    font-weight: 100;
+    text-align: center;
+}
+
+#loginButton-Box{
+    background: var(--secondary);
+    display: grid;
+    grid-template-rows: auto auto;
+}
+
+#loginButton-Box > div{
+    display: flex;  
+    justify-content: center;  
+    align-items: center; 
+}
+#loginButton-Box > div >p{
+    font-family:Open Sans;
+    font-weight: 700;
+    text-align: center;
+}
+
+

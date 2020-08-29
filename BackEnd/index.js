@@ -1,6 +1,7 @@
 const startupDebugger = require('debug')('app:startup');
 const dbDebugger = require('debug')('app:db');
 //use export DEBUG=app:debug,app:db
+const cors= require('cors');
 const Joi =require('joi');
 const express = require('express');
 const helmet = require('helmet');
@@ -10,6 +11,12 @@ const booksRouter= require('./routes/books');
 const usersRouter= require('./routes/users');
 const authorsRouter= require('./routes/authors');
 var app=express();
+
+const corsOptions = {
+    exposedHeaders: 'x-auth-token',
+};
+
+app.use(cors(corsOptions))
 app.use(express.json());
 app.use(helmet());
 app.use('/api/books',booksRouter); // routes starting with '/api/books will be handled by this router'
