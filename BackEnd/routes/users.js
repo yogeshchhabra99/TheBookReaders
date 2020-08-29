@@ -9,14 +9,10 @@ const books = require('./books.js');
 const userSchema = new mongoose.Schema({
     name: String,
     userId: String, //provided by google
-    booksToRead: [{
-        id:String,
-        name: String
-    }],
+    booksToRead: [String],
 
     booksRead: [{
         bookId: String,
-        name:String,
         review: String,
         rating: Number,
         favouriteLines: [String],
@@ -98,22 +94,14 @@ router.post('/booksRead', (req, res)=>{
                 });
             }
             else{
-            //sending bookId to books.js to find whether the book exist in database or not
-            //retrieving a promise bookSearch
-                return books.findBook(req.body.bookId);
-            }
-        })
-        .then(book=>{
-            console.log(book);
-            console.log(`${req.body.bookId} ${book.id}`);
-            return User.updateOne({_id:id_},{
-                $push:{
-                    booksRead:{
-                        bookId: book.id,
-                        name: book.name
+                User.updateOne({_id:id_},{
+                    $push:{
+                        booksRead:{
+                            bookId: req.body.bookId
+                        }
                     }
-                }
-            });
+                });
+            }
         })
         .then((bookRead)=>{
             console.log("Book is added to booksRead: ",bookRead);
@@ -145,5 +133,131 @@ function validateBookRead(bookRead){
     });
     return schema.validate(bookRead);
 }
+
+//api to add booksToRead to users profile
+router.post('/booksToRead', (req, res)=>{
+    //INPUT VALIDATION
+    validationResult = validateBookToRead(req.body);
+    if(validationResult.error){
+        res.status(400).send(
+            {
+                success: false,
+                error: validationResult.error
+            });
+        return ;
+    }
+    //retrieving user id from token key
+    const token = req.header('x-auth-token');
+    const id_= jwt.verify(token,config.get("tokenKey")).id;
+
+    User.findOne({_id:id_,booksToRead:{$elemMatch:{bookId:req.body.bookId}}})
+        .then((bookInBooksToRead)=>{
+            if(bookInBooksToRead){
+                console.log(`Book with id ${req.body.bookId} has been already added to booksToRead`);
+                throw({
+                    status:400,
+                    message:`Book with id ${req.body.bookId} has been already added to booksToRead`
+                });
+            }
+            else{
+                User.updateOne({_id:id_},{
+                    $push:{
+                        booksToRead:req.body.bookId
+                    }
+                });
+            }
+        })
+        .then((bookToRead)=>{
+            console.log("Book is added to booksToRead: ",bookToRead);
+            res.status(200).send({
+                success:true,
+                bookToRead:bookToRead,
+            });
+        })
+        .catch((e)=>{
+            console.log("Error adding in booksToRead");
+            if(e.status){
+                res.status(e.status).send({
+                    success:false,
+                    error:e.message
+                });
+            }
+            else{
+                res.status(500).send({
+                    success:false,
+                    error:e.message
+                });
+            }
+        });
+});
+
+function validateBookToRead(bookToRead){
+    const schema=Joi.object({
+        bookId: Joi.string().min(1).required()
+    });
+    return schema.validate(bookToRead);
+}
+
+//Get all books he has read
+router.get('/booksRead/:pageno',(req,res)=>{
+    const token = req.header('x-auth-token');
+    const id_= jwt.verify(token,config.get("tokenKey")).id;
+    console.log(`Finding booksRead by : ${id_}`);
+    User.findOne({_id:id_}).then((user)=>{
+        if((req.params.pageno>user.booksRead.length/10+1) || (req.params.pageno<1)){
+            console.log('Error 404. No such page exists.');
+            res.status(404).send({
+                success : false,
+                Error : `No page found.`
+            });
+            return;
+        }
+        else{
+            let page = user.booksRead.slice((req.params.pageno-1)*10,req.params.pageno*10);
+            console.log(page);
+            res.status(200).send({
+                success : true,
+                books : page
+            });
+        }
+    }).catch((e)=>{
+        console.log(`Error retrieving booksToRead : `,e.message);
+        res.status(500).send({
+            success:false,
+            error:e.message,
+        });
+    });
+});
+
+//Get all books he wants to read
+router.get('/booksToRead/:pageno',(req,res)=>{
+    const token = req.header('x-auth-token');
+    const id_= jwt.verify(token,config.get("tokenKey")).id;
+    console.log(`Finding booksToRead by : ${id_}`);
+    User.findOne({_id:id_}).then((user)=>{
+        if((req.params.pageno>user.booksToRead.length/10+1) || (req.params.pageno<1)){
+            console.log('Error 404. No such page exists.');
+            res.status(404).send({
+                success : false,
+                Error : `No page found.`
+            });
+            return;
+        }
+        else{
+            let page = user.booksToRead.slice((req.params.pageno-1)*10,req.params.pageno*10);
+            console.log(page);
+            res.status(200).send({
+                success : true,
+                books : page
+            });
+        }
+    }).catch((e)=>{
+        console.log(`Error retrieving booksToRead : `,e.message);
+        res.status(500).send({
+            success:false,
+            error:e.message,
+        });
+    });
+});
 
 module.exports = router;

@@ -81,7 +81,7 @@ const id_= jwt.verify(token,config.get("tokenKey")).id
 
 just for info, this token will be sent to the user when he logs in by us using jwt.sign({_id:id},config.get("tokenKey"));
 
-4. Instert a new rating
+4. Insert a new rating
 Type: Post
 Route:  /api/books/addRating
 Header:{
