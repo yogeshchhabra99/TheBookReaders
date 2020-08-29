@@ -120,13 +120,9 @@ Schema:
 {
     name: String,
     userId: String, (provided by google login)
-    booksToRead: [{
-        id: string, (_id of the book ducument added by mongoose)
-        name: string, name of the book
-    }]
+    booksToRead: [string (_id of the book ducument added by mongoose)]
     booksRead: [{
         bookId: String, (_id of the book ducument added by mongoose)
-        name: String,
         review: String,
         rating: Number,
         favouriteLines: [String],
@@ -204,6 +200,7 @@ Return:{
 Type:Get
 
 7. Get all books he wants to read
+Route: /api/users/booksToRead/:pageno
 Type:Get
 
 ####Author
