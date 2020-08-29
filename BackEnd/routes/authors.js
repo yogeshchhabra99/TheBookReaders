@@ -77,6 +77,26 @@ router.get('/:id/:pageno',(req,res)=>{
     });
 });
 
+function addBookToAuthor(authorId, book){
+    return new Promise((resolve, reject)=>{
+        Author.updateOne({_id:authorId},{
+            $push:{
+                books:book
+            }
+        }).then((bookAdded)=>{
+            resolve({
+                status:200,
+                message:`${book} added to ${authorId}`
+            });
+        }).catch((e)=>{
+            resolve({
+                status:500,
+                error:e.message
+            });
+        });
+    });
+}
+
 router.post('/addBook', (req, res)=>{
     //input validation
     validationResult=validationBook(req.body);
@@ -117,3 +137,4 @@ function validationBook(book){
 }
 
 module.exports = router;
+module.exports.addBookToAuthor = addBookToAuthor;
