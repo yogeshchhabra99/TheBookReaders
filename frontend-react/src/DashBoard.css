@@ -1,0 +1,21 @@
+h2{
+    font-family: Open Sans;
+}
+
+.horizontalScroll{
+    display: grid; 
+    grid-template-columns: auto auto auto auto auto;
+}
+
+
+.icon{
+    width: 8vw;
+    height:8vh;
+    margin: auto;
+}
+
+div.box{
+    background: yellow;
+    width: 15vw;
+    height: 15vh;
+}

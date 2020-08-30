@@ -1,0 +1,25 @@
+.bookCardWrapper{
+    display: inline-block;
+    height: 15vh;
+    width: 18vw;
+    background: red;
+    margin:5px;
+    text-align: center;
+}
+
+.bookCard{
+    display: grid;
+    grid-template-rows: auto auto auto;
+    padding:2vh;
+}
+
+
+
+.bookTitle{
+    font-size: x-large;
+    text-align: center;
+}
+
+.bookBy{
+    text-align: center;
+}

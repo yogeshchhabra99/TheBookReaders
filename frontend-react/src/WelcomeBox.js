@@ -10,6 +10,8 @@ import {
   Link,
   Redirect
 } from "react-router-dom";
+const config= require('./config.json');
+console.log(config);
 
 class WelcomeBox extends Component{
   state={
@@ -24,10 +26,12 @@ class WelcomeBox extends Component{
           },
         };
     
-        console.log(response.googleId);
-        axios.post('http://localhost:8000/api/users/login',{
+        console.log(response);
+        console.log(response.profileObj.email);
+        axios.post(config.backendUrl+'api/users/login',{
           userId : response.googleId,
           name: response.rt.Ad,
+          email: response.profileObj.email,
         }, myOptions)
         .then(res=>{
           localStorage.setItem('x-auth-token',res.headers['x-auth-token']);

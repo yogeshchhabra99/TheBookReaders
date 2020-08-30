@@ -10,7 +10,7 @@ const userSchema = new mongoose.Schema({
     name: String,
     userId: String, //provided by google
     booksToRead: [String],
-
+    email: String,
     booksRead: [{
         bookId: String,
         review: String,
@@ -26,6 +26,7 @@ router.post('/login',(req,res)=>{
     console.log("Login Request", req.body);
     validationResult = validateUser(req.body);
     if(validationResult.error){
+        console.log("validation failed");
         res.status(400).send(
             {
                 success: false,
@@ -45,6 +46,7 @@ router.post('/login',(req,res)=>{
             user = new User({
                 userId:req.body.userId,
                 name:req.body.name,
+                email:req.body.email,
             });
             user.save().then((user)=>{
                 const token= jwt.sign({id: user._id}, config.get("tokenKey"));
@@ -64,7 +66,8 @@ router.post('/login',(req,res)=>{
 function validateUser(user){
     const schema=Joi.object({
         userId: Joi.string().min(1).required(),
-        name: Joi.string().min(1).required()
+        name: Joi.string().min(1).required(),
+        email: Joi.string().min(1).required(),
     });
     return schema.validate(user);
 }
@@ -188,10 +191,10 @@ router.get('/booksRead/:pageno',(req,res)=>{
     console.log(`Finding booksRead by : ${id_}`);
     User.findOne({_id:id_}).then((user)=>{
         if((req.params.pageno>user.booksRead.length/10+1) || (req.params.pageno<1)){
-            console.log('Error 404. No such page exists.');
-            res.status(404).send({
-                success : false,
-                Error : `No page found.`
+            console.log('No such page exists.');
+            res.status(200).send({
+                success : true,
+                books : []
             });
             return;
         }

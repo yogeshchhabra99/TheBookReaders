@@ -4,17 +4,28 @@
     padding-top: 1vh;
 }
 
-#sideMenuItem{
+.sideMenuItem{
     height: 5vh;
     padding-left: 2vw;
     font-size: large;
-    
+    vertical-align: middle;
+    line-height: 5vh;
 }
 
-#sideMenuItem:hover{
+
+.sideMenuItem:hover{
     background:var(--secondary);
 }
 
-#sideMenuItem:active{
+.sideMenuItem:active{
     background:var(--title);
+}
+
+.sideMenuItemSelected{
+    background:var(--title);
+    height: 5vh;
+    padding-left: 2vw;
+    font-size: large;
+    vertical-align: middle;
+    line-height: 5vh;
 }
