@@ -81,6 +81,11 @@ router.post('/newBook',(req,res)=>{
 
     book.save()
         .then((bookAdded)=>{
+            authors.addBookToAuthor(req.body.author.id, bookAdded._id).then((m)=>{
+                console.log(m.message);
+            }).catch((e)=>{
+                console.log(e.message);
+            });
             console.log("Book Added: ",bookAdded);
             res.status(200).send({
                 success:true,

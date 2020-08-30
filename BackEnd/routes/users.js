@@ -87,13 +87,8 @@ router.post('/booksRead', (req, res)=>{
 
     User.findOne({_id:id_,booksRead:{$elemMatch:{bookId:req.body.bookId}}})
         .then((bookInBooksRead)=>{
-            if(bookInBooksRead){
+            if(bookInBooksRead)
                 console.log(`Book with id ${req.body.bookId} has been already added to booksRead`);
-                throw({
-                    status:400,
-                    message:`Book with id ${req.body.bookId} has been already added to booksRead`
-                });
-            }
             else{
                 User.updateOne({_id:id_},{
                     $push:{
@@ -101,30 +96,26 @@ router.post('/booksRead', (req, res)=>{
                             bookId: req.body.bookId
                         }
                     }
+                }).then((bookRead)=>{
+                    console.log("Book is added to booksRead: ",bookRead, id_);
+                    res.status(200).send({
+                        success:true,
+                        bookRead:bookRead,
+                    });
+                }).catch((e)=>{
+                    console.log("Error adding in booksRead");
+                    res.status(500).send({
+                        success:false,
+                        bookRead:e.message
+                    });
                 });
             }
-        })
-        .then((bookRead)=>{
-            console.log("Book is added to booksRead: ",bookRead);
-            res.status(200).send({
-                success:true,
-                bookRead:bookRead,
-            });
         })
         .catch((e)=>{
-            console.log("Error adding in booksRead");
-            if(e.status){
-                res.status(e.status).send({
-                    success:false,
-                    error:e.message
-                });
-            }
-            else{
-                res.status(500).send({
-                    success:false,
-                    bookRead:e.message
-                });
-            }
+            res.status(400).send({
+                success:false,
+                error:`Book with id ${req.body.bookId} has been already added to booksRead`
+            });
         });
 });
 
@@ -151,44 +142,35 @@ router.post('/booksToRead', (req, res)=>{
     const token = req.header('x-auth-token');
     const id_= jwt.verify(token,config.get("tokenKey")).id;
 
-    User.findOne({_id:id_,booksToRead:{$elemMatch:{bookId:req.body.bookId}}})
+    User.findOne({_id:id_,booksToRead:req.body.bookId})
         .then((bookInBooksToRead)=>{
-            if(bookInBooksToRead){
+            if(bookInBooksToRead)
                 console.log(`Book with id ${req.body.bookId} has been already added to booksToRead`);
-                throw({
-                    status:400,
-                    message:`Book with id ${req.body.bookId} has been already added to booksToRead`
-                });
-            }
             else{
                 User.updateOne({_id:id_},{
                     $push:{
                         booksToRead:req.body.bookId
                     }
+                }).then((bookToRead)=>{
+                    console.log("Book is added to booksToRead: ",bookToRead);
+                    res.status(200).send({
+                        success:true,
+                        bookToRead:bookToRead,
+                    });
+                }).catch((e)=>{
+                    console.log("Error adding in booksToRead");
+                    res.status(500).send({
+                        success:false,
+                        error:e.message
+                    });
                 });
             }
-        })
-        .then((bookToRead)=>{
-            console.log("Book is added to booksToRead: ",bookToRead);
-            res.status(200).send({
-                success:true,
-                bookToRead:bookToRead,
-            });
         })
         .catch((e)=>{
-            console.log("Error adding in booksToRead");
-            if(e.status){
-                res.status(e.status).send({
-                    success:false,
-                    error:e.message
-                });
-            }
-            else{
-                res.status(500).send({
-                    success:false,
-                    error:e.message
-                });
-            }
+            res.status(400).send({
+                success:false,
+                error:`Book with id ${req.body.bookId} has been already added to booksToRead`
+            });
         });
 });
 
