@@ -90,8 +90,13 @@ router.post('/booksRead', (req, res)=>{
 
     User.findOne({_id:id_,booksRead:{$elemMatch:{bookId:req.body.bookId}}})
         .then((bookInBooksRead)=>{
-            if(bookInBooksRead)
+            if(bookInBooksRead){
                 console.log(`Book with id ${req.body.bookId} has been already added to booksRead`);
+                res.status(400).send({
+                    status:400,
+                    error: `Book with id ${req.body.bookId} has been already added to booksRead`
+                });
+            }
             else{
                 User.updateOne({_id:id_},{
                     $push:{
@@ -100,10 +105,10 @@ router.post('/booksRead', (req, res)=>{
                         }
                     }
                 }).then((bookRead)=>{
-                    console.log("Book is added to booksRead: ",bookRead, id_);
+                    console.log("Book is added to booksRead: ",bookRead);
                     res.status(200).send({
                         success:true,
-                        bookRead:bookRead,
+                        bookRead:bookRead
                     });
                 }).catch((e)=>{
                     console.log("Error adding in booksRead");
@@ -115,9 +120,9 @@ router.post('/booksRead', (req, res)=>{
             }
         })
         .catch((e)=>{
-            res.status(400).send({
+            res.status(500).send({
                 success:false,
-                error:`Book with id ${req.body.bookId} has been already added to booksRead`
+                error:e.message
             });
         });
 });
@@ -127,6 +132,58 @@ function validateBookRead(bookRead){
         bookId: Joi.string().min(1).required()
     });
     return schema.validate(bookRead);
+}
+
+//api to add a favourite line
+router.post('/favouriteLine', (req, res)=>{
+    //INPUT VALIDATION
+    console.log(`good morning`);
+    validationResult = validateFavouriteLine(req.body);
+    if(validationResult.error){
+        res.status(400).send(
+            {
+                success: false,
+                error: validationResult.error
+            });
+        return ;
+    }
+    //retrieving user id from token key
+    const token = req.header('x-auth-token');
+    const id_= jwt.verify(token,config.get("tokenKey")).id;
+    // User.updateOne({_id:id_,booksRead:{$elemMatch:{bookId:req.body.bookId}}},{
+    //     $push:{
+    //         "booksRead.$[favouriteLines]":req.body.favouriteLine
+    //     }
+    // });
+    //,booksRead:{$elemMatch:{bookId:req.body.bookId}}
+    User.findOne({_id:id_,booksRead:{$elemMatch:{bookId:req.body.bookId}}}).then((user)=>{//return ;
+        user.booksRead.forEach((b)=>{
+            if(b.bookId==req.body.bookId){
+                b.favouriteLines.push(req.body.favouriteLine);
+            }  
+        });
+        return user.save();
+    }).then((fav)=>{
+        console.log(`favourite line is added for ${req.body.bookId}`);
+        res.status(200).send({
+            status:200,
+            message:`favourite line is added for ${req.body.bookId}`
+        });
+    }).catch((e)=>{
+        console.log("Error adding in favouriteLine");
+        res.status(500).send({
+            success:false,
+            error:e.message
+        });
+    });
+});
+
+function validateFavouriteLine(line){
+    const schema=Joi.object({
+        bookId: Joi.string().min(1).required(),
+        favouriteLine: Joi.string().min(1).required()
+    });
+    return schema.validate(line);
 }
 
 //api to add booksToRead to users profile
