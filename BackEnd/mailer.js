@@ -15,32 +15,27 @@ const TOKEN_PATH = 'token.json';
 
 
 
-class Mailer{
-  constructor(){
-    this.sendMailUtil=this.sendMailUtil.bind(this);
-  }
 
-  mail(mailId, line, bookName){
-    this.mailId=mailId; this.line=line; this.bookName=bookName;
-      authorizeToken(this.sendMailUtil);
+  function mail(mailId, line, bookName){
+      authorizeToken(sendMailUtil,mailId, line, bookName);
     
   }
 
 
-  sendMailUtil(auth){
-    console.log(this);
+  function sendMailUtil(auth,mailId, line, bookName){
+    console.log(mailId, line, bookName);
     const gmail = google.gmail({version: 'v1', auth});
     const subject = 'Daily Book Lines';
     const utf8Subject = `=?utf-8?B?${Buffer.from(subject).toString('base64')}?=`;
     const messageParts = [
       'From:<chhabra99yogesh@gmail.com>',
-      `To: <${this.mailId}>`,
+      `To: <${mailId}>`,
       'Content-Type: text/html; charset=utf-8',
       'MIME-Version: 1.0',
       `Subject: ${utf8Subject}`,
       '',
       `Today's Favourite Line reminder:<br>`,
-      `${this.line}<br> from the book: ${this.bookName}`,
+      `"${line}" <br> from the book: ${bookName}`,
     ];
     const message = messageParts.join('\n');
   
@@ -59,7 +54,7 @@ class Mailer{
     }).then(res=>console.log("success",res.data))
     .catch((e)=>console.log(e));
     }
-}
+
 
 
 
@@ -82,7 +77,7 @@ function authorize(credentials, callback) {
   });
 }
 
-function authorizeToken(callback) {
+function authorizeToken(callback, mailId, line, bookName) {
   client_id=config.get('client_id');
   client_secret=config.get('client_secret');
   redirect_uris="urn:ietf:wg:oauth:2.0:oob";
@@ -96,7 +91,7 @@ function authorizeToken(callback) {
       "token_type":"Bearer",
       "expiry_date":1598950439057}
     oAuth2Client.setCredentials(token);
-    callback(oAuth2Client);
+    callback(oAuth2Client,mailId, line, bookName);
   
 }
 
@@ -155,8 +150,7 @@ function listLabels(auth) {
 }
 
 function test(){
-mailer=new Mailer()
-mailer.mail("yasharora707@gmail.com","Hey There","The Book")
+mail("yasharora707@gmail.com","Hey There","The Book")
 }
 
-module.exports.Mailer=Mailer;
+module.exports.mail=mail;

@@ -10,18 +10,17 @@ const config = require('config');
 const booksRouter= require('./routes/books');
 const usersRouter= require('./routes/users');
 const authorsRouter= require('./routes/authors');
-const Mailer = require('./mailer.js').Mailer;
-const mailer = new Mailer();
+const mailer = require('./mailer.js');
 var schedule = require('node-schedule');
  
-var j = schedule.scheduleJob('0 0 21 * * *', function(){
+var j = schedule.scheduleJob('0 15 17 * * *', function(){
   usersRouter.getAllUsers().then((users=>{
     if(!users || users.length==0){
         console.log("No Users");
         return;
     }  
-    users.forEach(user=>{
-        console.log(user);
+    users.forEach(async (user)=>{
+        //console.log(user);
         if(user.booksRead.length!=0){
             toPick=user.lastMail+1;
             if(toPick>=user.booksRead.length){
@@ -29,7 +28,7 @@ var j = schedule.scheduleJob('0 0 21 * * *', function(){
             }
             checked=0;
             toMail=true;
-            console.log(toPick,user.booksRead.length);
+            //console.log(toPick,user.booksRead.length);
             while(user.booksRead[toPick].favouriteLines.length==0){
                 toPick++;
                 toPick%=user.booksRead.length;
@@ -40,17 +39,23 @@ var j = schedule.scheduleJob('0 0 21 * * *', function(){
                     break;
                 }
             }
-            console.log("debug",toPick);
-            console.log(user.booksRead[toPick]);
-            console.log(user.booksRead[toPick].favouriteLines.length);
+            //console.log("debug",toPick);
+            //console.log(user.booksRead[toPick]);
+            //console.log(user.booksRead[toPick].favouriteLines.length);
             if(toMail){
-                line=user.booksRead[toPick].favouriteLines[Math.floor(Math.random() * user.booksRead[toPick].favouriteLines.length)];
-                mailId=user.email;
-                booksRouter.findBook(user.booksRead[toPick].bookId).then(book=>{
-                    mailer.mail(mailId,line,book.name);
+                try{
+                var msg={line:""};
+                msg.line=user.booksRead[toPick].favouriteLines[Math.floor(Math.random() * user.booksRead[toPick].favouriteLines.length)];
+                //console.log("beforeee",user.email,msg.line);
+                    book= await booksRouter.findBook(user.booksRead[toPick].bookId)
+                //    console.log("before",user.email,msg.line);
+                    mailer.mail(user.email,msg.line,book.name);
                     user.lastMail=toPick;
-                    return user.save()
-                }).catch(e=>console.log(e))
+                    user.save()
+                }
+                catch(e){
+                    console.log(e)
+                }
             }
         }
       })
@@ -58,6 +63,14 @@ var j = schedule.scheduleJob('0 0 21 * * *', function(){
 });
 
 var app=express();
+
+app.use(function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", '*');
+    res.header("Access-Control-Allow-Credentials", true);
+    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
+    res.header("Access-Control-Allow-Headers", 'Origin,X-Requested-With,Content-Type,Accept,content-type,application/json');
+    next();
+});
 
 const corsOptions = {
     exposedHeaders: 'x-auth-token',
