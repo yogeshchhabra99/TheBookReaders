@@ -14,7 +14,7 @@ const Mailer = require('./mailer.js').Mailer;
 const mailer = new Mailer();
 var schedule = require('node-schedule');
  
-var j = schedule.scheduleJob('10,40 * 18 * * *', function(){
+var j = schedule.scheduleJob('0 0 21 * * *', function(){
   usersRouter.getAllUsers().then((users=>{
     if(!users || users.length==0){
         console.log("No Users");
