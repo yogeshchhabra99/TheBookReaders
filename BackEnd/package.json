@@ -17,6 +17,7 @@
     "joi": "^17.2.0",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.9.28",
-    "morgan": "^1.10.0"
+    "morgan": "^1.10.0",
+    "node-schedule": "^1.3.2"
   }
 }

@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import './SideMenu.css'
+import { GoogleLogout } from 'react-google-login';
 import {
     BrowserRouter as Router,
     Switch,
@@ -17,6 +18,8 @@ class SideMenu extends Component{
         booksReadClass:"sideMenuItem",
         bookWantToReadClass:"sideMenuItem",
         aboutClass:"sideMenuItem",
+        newAuthorClass:"sideMenuItem",
+        searchBooksClass:"sideMenuItem"
     }
 
     logOut=(e)=>{
@@ -35,6 +38,8 @@ class SideMenu extends Component{
             booksReadClass:"sideMenuItem",
             bookWantToReadClass:"sideMenuItem",
             aboutClass:"sideMenuItem",
+            newAuthorClass:"sideMenuItem",
+            searchBooksClass:"sideMenuItem"
         }
     }
 
@@ -54,6 +59,12 @@ class SideMenu extends Component{
     }
     about=(e)=>{
         this.props.changePage("about");
+    }
+    newAuthor=(e)=>{
+        this.props.changePage("newAuthor");
+    }
+    searchBooks=(e)=>{
+        this.props.changePage("searchBooks");    
     }
     render(){
         if(localStorage.getItem('x-auth-token')==null){
@@ -88,15 +99,31 @@ class SideMenu extends Component{
             this.resetState();
             this.state.aboutClass="sideMenuItemSelected"
         }
+        else if(this.props.selected=="newAuthor"){
+            this.resetState();
+            this.state.newAuthorClass="sideMenuItemSelected"
+        }
+        else if(this.props.selected=="searchBooks"){
+            this.resetState();
+            this.state.searchBooksClass="sideMenuItemSelected"
+        }
 
         return(
             <div id="sideMenu">
                 <div className={this.state.dashBoardClass} onClick={this.dashBoard}>DashBoard</div>
+                <div className={this.state.searchBooksClass} onClick={this.searchBooks}>Search Books</div>
                 <div className={this.state.booksReadClass} onClick={this.booksRead}>Books Read</div>
                 <div className={this.state.bookWantToReadClass} onClick={this.wantToRead}>Want to Read</div>
                 <div className={this.state.addBookClass} onClick={this.newBook}>New Book</div>
                 <div className={this.state.aboutClass} onClick={this.about}>About</div>
-                <div className={this.state.logOutClass} onClick={this.logOut}>Log Out</div>
+                <div className={this.state.newAuthorClass} onClick={this.newAuthor}>New Author</div>
+                {/* <div className={this.state.logOutClass} onClick={this.logOut}>Log Out</div> */}
+                <div className={this.state.logOutClass}><GoogleLogout
+      clientId={process.env.REACT_APP_THEBOOKREADERS_GOOGLEID}
+      buttonText="Logout"
+      onLogoutSuccess={this.logOut}
+    >
+    </GoogleLogout></div>
             </div>
         );
     }

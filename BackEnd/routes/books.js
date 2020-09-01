@@ -43,6 +43,7 @@ router.get('/bookId/:id', (req, res) => {
     console.log("Find book with id:",req.params.id);
     Book.findOne({_id:req.params.id})
         .then((book_)=>{
+            console.log(book_);
             res.status(200).send({
                 success:true,
                 book:book_
@@ -55,6 +56,25 @@ router.get('/bookId/:id', (req, res) => {
             });
         });
     
+});
+
+//searchBooks with partial keywords
+router.get('/search/:title',(req,res)=>{
+    console.log("/"+req.params.title+"/");
+    //Book.find({title:{$regex:"/"+req.params.title+"/", $options:'i'}})
+    Book.find({title:new RegExp(req.params.title,'i')})
+    //Book.find({title:req.params.title})
+    .then((results)=>{
+        console.log(results);
+        matches=results.slice(0,10);
+        res.status(200).send({
+            success:true,
+            books:matches});
+    })
+    .catch((e)=>{
+        console.log(e);
+        res.status(500).send({success:false,error:e.message});
+    })
 });
 
 //Add a new book

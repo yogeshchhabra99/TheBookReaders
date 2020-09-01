@@ -15,8 +15,9 @@ const userSchema = new mongoose.Schema({
         bookId: String,
         review: String,
         rating: Number,
-        favouriteLines: [String],
-    }]
+        favouriteLines: [String]
+    }],
+    lastMail:Number
 });
 
 const User = mongoose.model('Users', userSchema);
@@ -47,6 +48,7 @@ router.post('/login',(req,res)=>{
                 userId:req.body.userId,
                 name:req.body.name,
                 email:req.body.email,
+                lastMail:-1,
             });
             user.save().then((user)=>{
                 const token= jwt.sign({id: user._id}, config.get("tokenKey"));
@@ -246,4 +248,9 @@ router.get('/booksToRead/:pageno',(req,res)=>{
     });
 });
 
+function getAllUsers(){
+    return User.findOne({});
+}
+
 module.exports = router;
+module.exports.getAllUsers=getAllUsers;

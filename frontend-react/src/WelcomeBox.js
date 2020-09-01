@@ -52,6 +52,8 @@ class WelcomeBox extends Component{
       if(localStorage.getItem('x-auth-token')!=null){
           this.state.loggedIn=true;
       }
+      console.log(process.env.NODE_ENV);
+      //console.log(process.env.REACT_APP_THEBOOKREADERS_GOOGLEID);
 
       if(this.state.loggedIn==true)
         return(
@@ -74,7 +76,7 @@ class WelcomeBox extends Component{
                 </div>
                 <div >
                         <GoogleLogin
-                            clientId="604228920568-4b4s148gou4tqt6o8m5g6a3ephnrangf.apps.googleusercontent.com"
+                            clientId={process.env.REACT_APP_THEBOOKREADERS_GOOGLEID}
                             buttonText="Login"
     //                         render={renderProps => (
     //   <button onClick={renderProps.onClick} disabled={renderProps.disabled}>This is my custom Google button</button>

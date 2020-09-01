@@ -11,6 +11,25 @@ const authorSchema = new mongoose.Schema({
 
 const Author = mongoose.model('Authors', authorSchema);
 
+//search an author by name
+router.get('/search/:name',(req,res)=>{
+    console.log("/"+req.params.name+"/");
+    //Book.find({title:{$regex:"/"+req.params.title+"/", $options:'i'}})
+    Author.find({name:new RegExp(req.params.name,'i')})
+    //Book.find({title:req.params.title})
+    .then((results)=>{
+        console.log(results);
+        matches=results.slice(0,10);
+        res.status(200).send({
+            success:true,
+            authors:matches});
+    })
+    .catch((e)=>{
+        console.log(e);
+        res.status(500).send({success:false,error:e.message});
+    })
+});
+
 router.post('/newAuthor', (req, res)=>{
     //input validation
     validationResult=validationAuthor(req.body);

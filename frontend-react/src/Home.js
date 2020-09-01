@@ -19,7 +19,7 @@ class Home extends Component{
             <div id="home">
                 <SideMenu selected={this.state.selected} changePage={this.changePage}/>
                 <div id="mainHome">
-                    <MainHome selected={this.state.selected}/>
+                    <MainHome selected={this.state.selected} changePage={this.changePage}/>
                 </div>
             </div>
         );
