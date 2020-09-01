@@ -14,9 +14,14 @@ const Mailer = require('./mailer.js').Mailer;
 const mailer = new Mailer();
 var schedule = require('node-schedule');
  
-var j = schedule.scheduleJob('30 30 14 * * *', function(){
+var j = schedule.scheduleJob('10,40 * 18 * * *', function(){
   usersRouter.getAllUsers().then((users=>{
-      users.forEach(user=>{
+    if(!users || users.length==0){
+        console.log("No Users");
+        return;
+    }  
+    users.forEach(user=>{
+        console.log(user);
         if(user.booksRead.length!=0){
             toPick=user.lastMail+1;
             if(toPick>=user.booksRead.length){
@@ -35,14 +40,17 @@ var j = schedule.scheduleJob('30 30 14 * * *', function(){
                     break;
                 }
             }
+            console.log("debug",toPick);
+            console.log(user.booksRead[toPick]);
+            console.log(user.booksRead[toPick].favouriteLines.length);
             if(toMail){
-                line=user.BooksRead[toPick].favouriteLines[Math.floor(Math.random() * user.BooksRead[toPick].favouriteLines.length)];
+                line=user.booksRead[toPick].favouriteLines[Math.floor(Math.random() * user.booksRead[toPick].favouriteLines.length)];
                 mailId=user.email;
-                booksRouter.findBook(user.BooksRead[toPick].bookId).then(book=>{
-                    mailer.mail(email,line.book.name);
+                booksRouter.findBook(user.booksRead[toPick].bookId).then(book=>{
+                    mailer.mail(mailId,line,book.name);
                     user.lastMail=toPick;
-                    returnuser.save()
-                })
+                    return user.save()
+                }).catch(e=>console.log(e))
             }
         }
       })

@@ -1,5 +1,10 @@
 {
-    "port":"THEBOOKREADERS_PORT",
+    "port":"PORT",
     "env":"THEBOOKREADERS_ENV",
-    "tokenKey":"TOKENPRIVATEKEY"
+    "tokenKey":"TOKENPRIVATEKEY",
+    "client_id":"THEBOOKREADERS_CLIENT_ID",
+    "client_secret":"THEBOOKREADERS_CLIENT_SECRET",
+    "access_token":"THEBOOKREADERS_ACCESS_TOKEN",
+    "refresh_token":"THEBOOKREADERS_REFRESH_TOKEN",
+    "MONGO_PASSWORD":"MONGO_PASSWORD"
 }

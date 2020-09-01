@@ -7,8 +7,9 @@ const { ValidationError } = require('joi');
 const jwt = require('jsonwebtoken');
 const authors = require('./authors.js');
 
+const uri = `mongodb+srv://admin:${config.get('MONGO_PASSWORD')}@cluster0.bipqf.mongodb.net/thebookreaders?retryWrites=true&w=majority`;
 console.log(config.get('name'));
-mongoose.connect(config.get('mongodb'), {
+mongoose.connect(uri, {
         useNewUrlParser: true,
         useUnifiedTopology: true
     })

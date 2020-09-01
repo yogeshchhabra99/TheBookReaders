@@ -1,6 +1,7 @@
 const fs = require('fs');
 const readline = require('readline');
 const {google} = require('googleapis');
+const config = require('config');
 
 // If modifying these scopes, delete token.json.
 const SCOPES = ['https://www.googleapis.com/auth/gmail.readonly','https://mail.google.com/',
@@ -21,13 +22,10 @@ class Mailer{
 
   mail(mailId, line, bookName){
     this.mailId=mailId; this.line=line; this.bookName=bookName;
-    // Load client secrets from a local file.
-    fs.readFile('./credentials.json', (err, content) => {
-      if (err) return console.log('Error loading client secret file:', err);
-      // Authorize a client with credentials, then call the Gmail API.
-      authorize(JSON.parse(content), this.sendMailUtil);
-    });
+      authorizeToken(this.sendMailUtil);
+    
   }
+
 
   sendMailUtil(auth){
     console.log(this);
@@ -41,8 +39,8 @@ class Mailer{
       'MIME-Version: 1.0',
       `Subject: ${utf8Subject}`,
       '',
-      `Todays Favourite Line reminder:<br>`,
-      `${this.line}<br> from the book:${this.bookName}`,
+      `Today's Favourite Line reminder:<br>`,
+      `${this.line}<br> from the book: ${this.bookName}`,
     ];
     const message = messageParts.join('\n');
   
@@ -82,6 +80,24 @@ function authorize(credentials, callback) {
     oAuth2Client.setCredentials(JSON.parse(token));
     callback(oAuth2Client);
   });
+}
+
+function authorizeToken(callback) {
+  client_id=config.get('client_id');
+  client_secret=config.get('client_secret');
+  redirect_uris="urn:ietf:wg:oauth:2.0:oob";
+  const oAuth2Client = new google.auth.OAuth2(
+    client_id, client_secret,redirect_uris);
+
+    token={
+      "access_token":config.get('access_token'),
+      "refresh_token":config.get('refresh_token'),
+      "scope":"https://mail.google.com/ https://www.googleapis.com/auth/gmail.send https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/gmail.modify https://www.googleapis.com/auth/gmail.compose",
+      "token_type":"Bearer",
+      "expiry_date":1598950439057}
+    oAuth2Client.setCredentials(token);
+    callback(oAuth2Client);
+  
 }
 
 /**
