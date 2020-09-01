@@ -14,7 +14,7 @@ const Mailer = require('./mailer.js').Mailer;
 const mailer = new Mailer();
 var schedule = require('node-schedule');
  
-var j = schedule.scheduleJob('0 25 14 * * *', function(){
+var j = schedule.scheduleJob('30 30 14 * * *', function(){
   usersRouter.getAllUsers().then((users=>{
       users.forEach(user=>{
         if(user.booksRead.length!=0){
@@ -24,6 +24,7 @@ var j = schedule.scheduleJob('0 25 14 * * *', function(){
             }
             checked=0;
             toMail=true;
+            console.log(toPick,user.booksRead.length);
             while(user.booksRead[toPick].favouriteLines.length==0){
                 toPick++;
                 toPick%=user.booksRead.length;

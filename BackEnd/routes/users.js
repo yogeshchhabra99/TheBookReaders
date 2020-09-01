@@ -306,7 +306,7 @@ router.get('/booksToRead/:pageno',(req,res)=>{
 });
 
 function getAllUsers(){
-    return User.findOne({});
+    return User.find({});
 }
 
 module.exports = router;
