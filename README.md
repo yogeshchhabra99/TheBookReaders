@@ -1,4 +1,6 @@
 # TheBookReaders
+FrontEnd Deployed at: https://ancient-temple-75981.herokuapp.com/home
+Backend Deployed at:https://fierce-beyond-51021.herokuapp.com/
 
 ## Description
 This is a app where Readers can add the books the have read or want to read. Add reviews for books they read and their favourite lines from that book. This app will mail the user one of their favourite lines daily. There will be a BookExchange program too.
